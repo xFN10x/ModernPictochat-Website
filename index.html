@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script async defer src="js/mainPage.js"></script>
+    <meta http-equiv="Content-Type" content="text/html" />
+    <meta name="author" content="xFN10x" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Pictochat</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=BBH+Sans+Bartle&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      p,
+      .noto-sans {
+        font-family: "Noto Sans", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 600;
+        font-style: normal;
+        font-variation-settings: "wdth" 100;
+      }
+
+      .bbh-sans-bartle-regular {
+        font-family: "BBH Sans Bartle", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      background: #dbdbdb;
+      background: linear-gradient(
+        90deg,
+        rgba(219, 219, 219, 1) 0%,
+        rgba(102, 102, 102, 1) 100%
+      );
+    "
+  >
+    <h1 style="text-align: center">Modern Pictochat</h1>
+    <h3 style="text-align: center; margin-bottom: 0">
+      Pictochat in the web, made for modern devices!
+    </h3>
+    <div style="display: flex; justify-content: center; margin: 1rem">
+      <script src="https://cdn.jsdelivr.net/npm/@hcaptcha/vanilla-hcaptcha" async defer></script>
+
+      <h-captcha
+        id="signupCaptcha"
+        site-key="93d0a366-6982-4558-a108-62a03b96ce24"
+        host="mpc.xplate.dev"
+        size="normal"
+        theme="dark"
+        tabindex="0"
+      ></h-captcha>
+    </div>
+    <div style="justify-content: center; display: flex">
+      <div
+        id="chatsDisplay"
+        style="
+          padding: 1rem 4rem;
+          background-color: white;
+          border: 0.3rem solid black;
+        "
+      >
+        <p style="text-align: center; margin-bottom: 0">Current Chats:</p>
+        <div style="width: 10rem"></div>
+        <p
+          id="status-text"
+          style="
+            text-align: center;
+            margin-top: 1px;
+            -webkit-text-fill-color: #d3d3d3;
+          "
+        >
+          <i>Loading...</i>
+        </p>
+        <template id="chatVisual">
+          <div
+            style="
+              min-height: 4rem;
+              background-color: white;
+              border: 0.2rem double black;
+            "
+          >
+            <p
+              style="
+                margin: -3px 0;
+                -webkit-text-fill-color: white;
+                -webkit-text-stroke: 1px;
+                user-select: none;
+              "
+              class="bbh-sans-bartle-regular"
+            >
+              Chat A
+            </p>
+            <img
+              src="people.png"
+              style="
+                image-rendering: crisp-edges;
+                padding-left: 4px;
+                margin-top: 4px;
+              "
+              width="20px"
+            />
+            <i
+              class="noto-sans"
+              style="-webkit-text-stroke: 0; -webkit-text-fill-color: black"
+              ><sup>1/15</sup></i
+            >
+            <div style="display: flex; padding: 5px; justify-content: right">
+              <button>Join!</button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </body>
+</html>
