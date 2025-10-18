@@ -22,6 +22,43 @@
     />
 
     <style>
+      @font-face {
+        font-family: "Pictochat";
+        src: url("pictochat.otf.woff2");
+      }
+      ul li {
+        padding-left: 1.3rem;
+        background-image: url("favicon.png");
+        background-position: 0 0;
+        background-size: 1.1rem;
+        background-repeat: no-repeat;
+      }
+
+  
+
+      ul {
+        /*rotate this so it goes down to up, then unrotate the elements*/
+        transform: rotate(180deg);
+        padding-inline-start: 0;
+      }
+
+      ul > li {
+        transform: rotate(-180deg);
+        font-family: "Pictochat";
+        font-size: 25px;
+        background-color: #ebebeb;
+      }
+
+      li > img {
+        aspect-ratio: 16/9;
+        object-fit: contain;
+        width: 100%;
+        max-width: 30rem;
+      }
+      li > img::before {
+        height: 150rem;
+      }
+
       h1,
       h2,
       h3,
@@ -67,14 +104,28 @@
           min-height: 90vh;
         "
       >
-        <div style="border: 1px double #d3d3d3; height: 70%; width: 100%">
-          chat area
-        </div>
+        <ul
+          onwheel="event.preventDefault(); this.scrollTop -= event.deltaY;"
+          style="
+            align-items: flex-end;
+            border: 1px double #d3d3d3;
+            height: 60vh;
+            vertical-align: baseline;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            list-style: none;
+          "
+        >
+          <li>
+            <b>&lt;_FN10_&gt;</b><br />
+            <img alt="Image sent by user." src="test.png" />
+          </li>
+        </ul>
         <div style="display: flex; justify-content: center">
           <canvas
-          id="chatCanvas"
+            id="chatCanvas"
             style="
-            background-color: white;
+              background-color: white;
               border: 3px solid #d3d3d3;
               aspect-ratio: 16/9;
               max-width: 100%;

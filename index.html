@@ -59,8 +59,11 @@
       Pictochat in the web, made for modern devices!
     </h3>
     <div style="display: flex; justify-content: center; margin: 1rem">
-      <script src="https://cdn.jsdelivr.net/npm/@hcaptcha/vanilla-hcaptcha" async defer></script>
-
+      <script
+        src="https://cdn.jsdelivr.net/npm/@hcaptcha/vanilla-hcaptcha"
+        async
+        defer
+      ></script>
       <h-captcha
         id="signupCaptcha"
         site-key="93d0a366-6982-4558-a108-62a03b96ce24"
@@ -69,6 +72,7 @@
         theme="dark"
         tabindex="0"
       ></h-captcha>
+      <input id="usernameInput" placeholder="Username" style="margin-left: 0.6rem; max-height: 1rem;" />
     </div>
     <div style="justify-content: center; display: flex">
       <div
@@ -125,7 +129,7 @@
               ><sup>1/15</sup></i
             >
             <div style="display: flex; padding: 5px; justify-content: right">
-              <button>Join!</button>
+              <button onclick="">Join!</button>
             </div>
           </div>
         </template>

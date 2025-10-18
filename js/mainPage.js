@@ -1,25 +1,61 @@
-//@ts-check
+// @ts-nocheck
 
 const statusText = document.getElementById("status-text");
 const chatsDisplay = document.getElementById("chatsDisplay");
 const signupCaptcha = document.getElementById("signupCaptcha");
+const usernameInput = document.getElementById("usernameInput");
+
+/**
+ * @type {string | null}
+ */
+var captChaKey = null;
+
+if (usernameInput != null && localStorage.getItem("name") != null) {
+  // @ts-ignore
+  usernameInput.value = localStorage.getItem("name");
+}
+/**
+ * @param {string} id
+ */
+function joinChat(id) {
+  var capchaValid = false;
+  fetch("https://mpc.xplate.dev/api/capchaValid", {
+    method: "POST",
+    body: captChaKey,
+    headers: {
+      "Content-type": "text/plain; charset=UTF-8",
+    },
+  }).then((res) => {
+    if (res.ok) {
+      res.json().then((val) => {
+        console.log("Got captchaValid body: " + val.success);
+
+        if (!val.success) {
+          console.error("Captcha isnt valid; cannot join.");
+          return;
+        }
+
+        fetch("https://mpc.xplate.dev/api/getChatByName/" + id).then((res) => {
+          if (res.ok) {
+            res.text().then((txt) => {
+              if (usernameInput.value == null || usernameInput.value === "")
+              if (usernameInput != null) {
+                // @ts-ignore
+                localStorage.setItem("name", usernameInput.value);
+              }
+              window.location.href = "chat?join=" + txt;
+            });
+          }
+        });
+      });
+    }
+  });
+}
 
 if (signupCaptcha != null) {
   signupCaptcha.addEventListener("verified", (e) => {
     // @ts-ignore
-    console.log("verified event", { token: e.token });
-    // @ts-ignore
-    console.log("Local key: " + e.token);
-    fetch("https://mpc.xplate.dev/api/capchaValid", {
-      method: "POST",
-      // @ts-ignore
-      body: e.token,
-      headers: {
-        "Content-type": "text/plain; charset=UTF-8",
-      },
-    }).then((res) => {
-      console.log(res);
-    });
+    captChaKey = e.token;
   });
   signupCaptcha.addEventListener("error", (e) => {
     console.log("error event", { error: e.error });
@@ -66,7 +102,7 @@ fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
             ><sup>${data[key].peopleCurrently}/${data[key].maxPeople}</sup></i
           >
           <div style="display: flex; padding: 5px; justify-content: right">
-            <button>Join!</button>
+            <button onClick=\"joinChat(\`${data[key].name}\`)\" >Join!</button>
           </div>
         </div>`;
         chatsDisplay?.insertAdjacentHTML("beforeend", chatVisualHTML);

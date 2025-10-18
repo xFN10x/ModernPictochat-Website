@@ -4,7 +4,8 @@ const drawingCanvas = document.getElementById("chatCanvas");
 const brushSize = 3;
 
 //connect with websocket
-const socket = new WebSocket("wss://mpc.xplate.dev/ws/chat");
+const socket = new WebSocket("wss://mpc.xplate.dev/ws");
+// @ts-ignore
 socket.addEventListener("open", (event) => {
   socket.send("Hello Server!");
 });
@@ -52,12 +53,15 @@ fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
             <button>Join!</button>
           </div>
         </div>`;
+        // @ts-ignore
         chatsDisplay?.insertAdjacentHTML("beforeend", chatVisualHTML);
         console.log(
           `chat with id: ${key}, has ${data[key].peopleCurrently}/${data[key].maxPeople} people in it`
         );
       }
+      // @ts-ignore
       if (statusText != null)
+        // @ts-ignore
         statusText.innerHTML = `<i>${peopleOn} people are online in ${chatsOpen} chats.</i>`;
       else console.error("No status text!");
     });
@@ -81,6 +85,7 @@ if (drawingCanvas != null) {
   var mousePositionY;
 
   function moved() {
+    // @ts-ignore
     var setIntervalId = setInterval(() => {
       if (beingHeld)
         ctx.fillRect(mousePositionX, mousePositionY, brushSize, brushSize);
