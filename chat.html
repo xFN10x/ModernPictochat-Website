@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!--use the main script to get the chats-->
     <script async defer src="js/chatDrawing.js"></script>
+    <script>
+      //check if there is a username before loading the rest
+      if (
+        localStorage.getItem("name") == null ||
+        localStorage.getItem("name") === ""
+      )
+        window.location.href = "/";
+      //check to see if there is someone in the same chat with the same username
+      fetch(
+        `https://mpc.xplate.dev/api/isPersonInChat/${new URLSearchParams(
+          window.location.search
+        ).get("join")}/${localStorage.getItem("name")}`
+      ).then((res) => {
+        if (res.ok) {
+          res.text().then((text) => {
+            console.log("Same person? " + text);
+            if (text === "true") {
+              //if there is, go back
+              window.location.href = "/";
+            }
+          });
+        }
+      });
+    </script>
     <meta http-equiv="Content-Type" content="text/html" />
     <meta name="author" content="xFN10x" />
 
@@ -103,6 +126,7 @@
         "
       >
         <ul
+          id="messageList"
           onwheel="event.preventDefault(); this.scrollTop -= event.deltaY;"
           style="
             align-items: flex-end;
@@ -114,8 +138,33 @@
             list-style: none;
           "
         >
+          <li
+            style="
+              background-color: greenyellow;
+              background-image: url(player-entered.png);
+              height: 1.2rem;
+            "
+          >
+            User connected: <b>USER</b>
+          </li>
+          <li
+            style="
+              background-color: rgb(255, 47, 47);
+              background-image: url(player-left.png);
+              height: 1.2rem;
+            "
+          >
+            User left: <b>USER</b>
+          </li>
           <li>
-            <b>&lt;_FN10_&gt;</b><br />
+            <b
+              >&lt;USER&gt;
+              <i
+                class="sendingText"
+                style="font-size: 1rem; -webkit-text-fill-color: #adadad"
+                >Sending...</i
+              ></b
+            ><br />
             <img alt="Image sent by user." src="test.png" />
           </li>
         </ul>
@@ -152,12 +201,19 @@
             <img
               id="enterImg"
               onclick="
+              if (!makeChatHtmlElement(localStorage.getItem(`name`), document.getElementById(`chatCanvas`).toDataURL()))
+              return;
+            console.log(`our id: ${ourID}`)
               const json = JSON.stringify({
                 messageType:1,
-                data: document.getElementById(`chatCanvas`).toDataURL()
+                data: JSON.stringify({
+                  data: document.getElementById(`chatCanvas`).toDataURL(),
+                  id: ourID
+                }) 
               })
               console.log(json)
-              socket.send(json)"
+              socket.send(json)
+              "
               onmouseenter="document.getElementById(`enterImg`).src = `enter-pressed.png`"
               onmouseleave="document.getElementById(`enterImg`).src = `enter.png`"
               style="

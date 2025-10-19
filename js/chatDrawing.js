@@ -5,6 +5,12 @@ const drawingCanvas = document.getElementById("chatCanvas");
 const brushSize = 3;
 
 const urlSearchParams = new URLSearchParams(window.location.search);
+const messageList = document.getElementById("messageList");
+/**
+ * @type {boolean}
+ */
+var messageSending;
+var ourID;
 
 //connect with websocket
 
@@ -20,22 +26,46 @@ socket.onmessage = (
    * @type {MessageEvent}
    */ event
 ) => {
-  if (event.data == "reloadChats") {
+  var data;
+  try {
+    data = JSON.parse(event.data);
+  } catch (er) {
+    data = event.data;
+  }
+  console.log("Got message: " + data);
+  if (data == "reloadChats") {
     reloadChats();
+  } else if (Object.hasOwn(data, "id")) {
+    ourID = data.id;
+  } else if (Object.hasOwn(data, "chatStatus")) {
+    if (!messageSending) {
+      console.warn("Somehow we sent a chat without an html element");
+      return;
+    }
+    if (data.chatStatus == 200) {
+      var element;
+      if (
+        messageSending &&
+        (element = document.getElementById("sendingText")) != null
+      ) {
+        element.innerText = "Sent!";
+        messageSending = false;
+      }
+    }
   }
 };
 
 socket.addEventListener("open", (event) => {
   setInterval(function () {
     socket.send("ping");
-  }, 10000);
+  }, 5000);
   if (urlSearchParams.has("join")) {
     socket.send(
       JSON.stringify({
         messageType: 0,
         data: JSON.stringify({
           roomID: urlSearchParams.get("join"),
-          username: "name",
+          username: localStorage.getItem("name"),
         }),
       })
     );
@@ -153,3 +183,26 @@ if (drawingCanvas != null) {
 }
 
 reloadChats();
+
+/**
+ * @param {string} username
+ * @param {string} imageUri
+ */
+function makeChatHtmlElement(username, imageUri) {
+  if (messageSending) {
+    console.error("Message already sending.");
+    return false;
+  }
+  const html = `<li>
+            <b
+              >&lt;${username}&gt;
+              <i id="sendingText" style="font-size: 1rem; -webkit-text-fill-color: #adadad"
+                >Sending...</i
+              ></b
+            ><br />
+            <img alt="Image sent by user." src="${imageUri}" />
+          </li>`;
+  messageSending = true;
+  messageList?.insertAdjacentHTML("afterbegin", html);
+  return true;
+}

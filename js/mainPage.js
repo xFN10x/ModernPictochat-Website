@@ -4,13 +4,15 @@ const statusText = document.getElementById("status-text");
 const chatsDisplay = document.getElementById("chatsDisplay");
 const signupCaptcha = document.getElementById("signupCaptcha");
 const usernameInput = document.getElementById("usernameInput");
-
 /**
  * @type {string | null}
  */
 var captChaKey = null;
 
-if (usernameInput != null && localStorage.getItem("name") != null) {
+if (
+  localStorage.getItem("name") != null &&
+  localStorage.getItem("name") !== ""
+) {
   // @ts-ignore
   usernameInput.value = localStorage.getItem("name");
 }
@@ -38,12 +40,12 @@ function joinChat(id) {
         fetch("https://mpc.xplate.dev/api/getChatByName/" + id).then((res) => {
           if (res.ok) {
             res.text().then((txt) => {
-              if (usernameInput.value == null || usernameInput.value === "")
-              if (usernameInput != null) {
-                // @ts-ignore
+              if (usernameInput.value !== "") {
                 localStorage.setItem("name", usernameInput.value);
+                window.location.href = "chat?join=" + txt;
+              } else {
+                console.warn("No username")
               }
-              window.location.href = "chat?join=" + txt;
             });
           }
         });
