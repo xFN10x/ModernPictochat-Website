@@ -151,6 +151,13 @@
             />
             <img
               id="enterImg"
+              onclick="
+              const json = JSON.stringify({
+                messageType:1,
+                data: document.getElementById(`chatCanvas`).toDataURL()
+              })
+              console.log(json)
+              socket.send(json)"
               onmouseenter="document.getElementById(`enterImg`).src = `enter-pressed.png`"
               onmouseleave="document.getElementById(`enterImg`).src = `enter.png`"
               style="
@@ -185,7 +192,7 @@
             -webkit-text-fill-color: #d3d3d3;
           "
         >
-          <i>Loading...</i>
+          <i id="statusText">Loading...</i>
         </p>
         <template id="chatVisual">
           <div

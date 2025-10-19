@@ -1,30 +1,66 @@
 //@ts-check
 const drawingCanvas = document.getElementById("chatCanvas");
+//const statusText = document.getElementById("status-text");
 
 const brushSize = 3;
 
-const urlSearchParams = new URLSearchParams(window.location.search)
+const urlSearchParams = new URLSearchParams(window.location.search);
 
 //connect with websocket
+
 const socket = new WebSocket("wss://mpc.xplate.dev/ws");
+window.addEventListener("unload", () => {
+  socket.send("close");
+});
+
 // @ts-ignore
+
+socket.onmessage = (
+  /**
+   * @type {MessageEvent}
+   */ event
+) => {
+  if (event.data == "reloadChats") {
+    reloadChats();
+  }
+};
+
 socket.addEventListener("open", (event) => {
+  setInterval(function () {
+    socket.send("ping");
+  }, 10000);
   if (urlSearchParams.has("join")) {
-    
+    socket.send(
+      JSON.stringify({
+        messageType: 0,
+        data: JSON.stringify({
+          roomID: urlSearchParams.get("join"),
+          username: "name",
+        }),
+      })
+    );
   }
 });
 
-fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
-  if (res.ok) {
-    res.json().then((data) => {
-      //const parsed = JSON.parse(data);
-      let peopleOn = 0;
-      let chatsOpen = 0;
-      for (const key in data) {
-        peopleOn += data[key].peopleCurrently;
-        chatsOpen++;
-        const chatVisualHTML = `
+function reloadChats() {
+  fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
+    if (res.ok) {
+      res.json().then((data) => {
+        //const parsed = JSON.parse(data);
+        let peopleOn = 0;
+        let chatsOpen = 0;
+
+        const collection = document.querySelectorAll("div.chatDisplayChlid");
+        collection.forEach(function (element) {
+          element.remove();
+        });
+
+        for (const key in data) {
+          peopleOn += data[key].peopleCurrently;
+          chatsOpen++;
+          const chatVisualHTML = `
 		<div
+          class="chatDisplayChlid"
           style="
             min-height: 4rem;
             background-color: white;
@@ -57,20 +93,21 @@ fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
             <button>Join!</button>
           </div>
         </div>`;
+          // @ts-ignore
+          chatsDisplay?.insertAdjacentHTML("beforeend", chatVisualHTML);
+          console.log(
+            `chat with id: ${key}, has ${data[key].peopleCurrently}/${data[key].maxPeople} people in it`
+          );
+        }
         // @ts-ignore
-        chatsDisplay?.insertAdjacentHTML("beforeend", chatVisualHTML);
-        console.log(
-          `chat with id: ${key}, has ${data[key].peopleCurrently}/${data[key].maxPeople} people in it`
-        );
-      }
-      // @ts-ignore
-      if (statusText != null)
-        // @ts-ignore
-        statusText.innerHTML = `<i>${peopleOn} people are online in ${chatsOpen} chats.</i>`;
-      else console.error("No status text!");
-    });
-  }
-});
+        if (statusText != null)
+          // @ts-ignore
+          statusText.innerHTML = `<i>${peopleOn} people are online in ${chatsOpen} chats.</i>`;
+        else console.error("No status text!");
+      });
+    }
+  });
+}
 
 if (drawingCanvas != null) {
   /**
@@ -109,8 +146,10 @@ if (drawingCanvas != null) {
     mousePositionX = e.offsetX;
     mousePositionY = e.offsetY / 1.12;
     //console.log(ctx.canvas.width + " : " + e.offsetX);
-    console.log(ctx.canvas.height + " : " + e.offsetY);
+    //console.log(ctx.canvas.height + " : " + e.offsetY);
 
     moved();
   });
 }
+
+reloadChats();
