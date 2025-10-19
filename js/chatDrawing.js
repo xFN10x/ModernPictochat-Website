@@ -1,6 +1,9 @@
 //@ts-check
 const drawingCanvas = document.getElementById("chatCanvas");
-//const statusText = document.getElementById("status-text");
+// @ts-ignore
+const chatsDisplay = document.getElementById("chatsDisplay");
+// @ts-ignore
+const statusText = document.getElementById("status-text");
 
 const brushSize = 3;
 
@@ -37,6 +40,23 @@ socket.onmessage = (
     reloadChats();
   } else if (Object.hasOwn(data, "id")) {
     ourID = data.id;
+  } else if (Object.hasOwn(data, "type") && Object.hasOwn(data, "username")) {
+    switch (data.type) {
+      case 2:
+        makeChatHtmlElement(data.username, data.data, false);
+        break;
+
+      case 0:
+        makeChatJoinNotifElement(data.username);
+        break;
+
+      case 1:
+        makeChatLeaveNotifElement(data.username);
+        break;
+
+      default:
+        break;
+    }
   } else if (Object.hasOwn(data, "chatStatus")) {
     if (!messageSending) {
       console.warn("Somehow we sent a chat without an html element");
@@ -187,8 +207,9 @@ reloadChats();
 /**
  * @param {string} username
  * @param {string} imageUri
+ * @param {boolean} fromSelf
  */
-function makeChatHtmlElement(username, imageUri) {
+function makeChatHtmlElement(username, imageUri, fromSelf) {
   if (messageSending) {
     console.error("Message already sending.");
     return false;
@@ -197,12 +218,46 @@ function makeChatHtmlElement(username, imageUri) {
             <b
               >&lt;${username}&gt;
               <i id="sendingText" style="font-size: 1rem; -webkit-text-fill-color: #adadad"
-                >Sending...</i
+                >${fromSelf ? "Sending..." : ""}</i
               ></b
             ><br />
             <img alt="Image sent by user." src="${imageUri}" />
           </li>`;
-  messageSending = true;
+  if (fromSelf) messageSending = true;
+  messageList?.insertAdjacentHTML("afterbegin", html);
+  return true;
+}
+
+/**
+ * @param {string} username
+ */
+function makeChatJoinNotifElement(username) {
+  const html = `<li
+            style="
+              background-color: greenyellow;
+              background-image: url(player-entered.png);
+              height: 1.2rem;
+            "
+          >
+            User connected: <b>${username}</b>
+          </li>`;
+  messageList?.insertAdjacentHTML("afterbegin", html);
+  return true;
+}
+
+/**
+ * @param {string} username
+ */
+function makeChatLeaveNotifElement(username) {
+  const html = `<li
+            style="
+              background-color: rgb(255, 47, 47);
+              background-image: url(player-left.png);
+              height: 1.2rem;
+            "
+          >
+            User left: <b>${username}</b>
+          </li>`;
   messageList?.insertAdjacentHTML("afterbegin", html);
   return true;
 }

@@ -138,7 +138,7 @@
             list-style: none;
           "
         >
-          <li
+          <template
             style="
               background-color: greenyellow;
               background-image: url(player-entered.png);
@@ -146,8 +146,8 @@
             "
           >
             User connected: <b>USER</b>
-          </li>
-          <li
+    </template>
+          <template
             style="
               background-color: rgb(255, 47, 47);
               background-image: url(player-left.png);
@@ -155,8 +155,8 @@
             "
           >
             User left: <b>USER</b>
-          </li>
-          <li>
+          </template>
+          <template>
             <b
               >&lt;USER&gt;
               <i
@@ -166,7 +166,7 @@
               ></b
             ><br />
             <img alt="Image sent by user." src="test.png" />
-          </li>
+          </template>
         </ul>
         <div id="userControl" style="display: flex; justify-content: center">
           <canvas
@@ -201,7 +201,7 @@
             <img
               id="enterImg"
               onclick="
-              if (!makeChatHtmlElement(localStorage.getItem(`name`), document.getElementById(`chatCanvas`).toDataURL()))
+              if (!makeChatHtmlElement(localStorage.getItem(`name`), document.getElementById(`chatCanvas`).toDataURL(), true))
               return;
             console.log(`our id: ${ourID}`)
               const json = JSON.stringify({
