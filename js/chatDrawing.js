@@ -3,11 +3,15 @@ const drawingCanvas = document.getElementById("chatCanvas");
 
 const brushSize = 3;
 
+const urlSearchParams = new URLSearchParams(window.location.search)
+
 //connect with websocket
 const socket = new WebSocket("wss://mpc.xplate.dev/ws");
 // @ts-ignore
 socket.addEventListener("open", (event) => {
-  socket.send("Hello Server!");
+  if (urlSearchParams.has("join")) {
+    
+  }
 });
 
 fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {

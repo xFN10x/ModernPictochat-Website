@@ -34,8 +34,6 @@
         background-repeat: no-repeat;
       }
 
-  
-
       ul {
         /*rotate this so it goes down to up, then unrotate the elements*/
         transform: rotate(180deg);
@@ -121,7 +119,7 @@
             <img alt="Image sent by user." src="test.png" />
           </li>
         </ul>
-        <div style="display: flex; justify-content: center">
+        <div id="userControl" style="display: flex; justify-content: center">
           <canvas
             id="chatCanvas"
             style="
@@ -134,6 +132,37 @@
               margin: 1rem 0;
             "
           ></canvas>
+          <div
+            style="
+              background-color: #d3d3d3;
+              margin: 1rem 0;
+              max-width: 3rem;
+              position: relative;
+              display: grid;
+            "
+          >
+            <img
+              id="clearImg"
+              onmouseenter="document.getElementById(`clearImg`).src = `clear-pressed.png`"
+              onmouseleave="document.getElementById(`clearImg`).src = `clear.png`"
+              style="cursor: pointer; min-width: 3rem; max-width: 3rem"
+              src="clear.png"
+              onclick="const canvas = document.getElementById(`chatCanvas`); canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)"
+            />
+            <img
+              id="enterImg"
+              onmouseenter="document.getElementById(`enterImg`).src = `enter-pressed.png`"
+              onmouseleave="document.getElementById(`enterImg`).src = `enter.png`"
+              style="
+                cursor: pointer;
+                min-width: 3rem;
+                max-width: 3rem;
+                position: absolute;
+                bottom: 0;
+              "
+              src="enter.png"
+            />
+          </div>
         </div>
       </div>
       <!--<div style="justify-content: center; display: flex">-->
