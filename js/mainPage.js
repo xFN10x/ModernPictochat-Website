@@ -21,7 +21,7 @@ if (
  */
 function joinChat(id) {
   var capchaValid = false;
-  fetch("https://mpc.xplate.dev/api/capchaValid", {
+  fetch(window.location.protocol + "//" + window.location.hostname +"/api/capchaValid", {
     method: "POST",
     body: captChaKey,
     headers: {
@@ -37,7 +37,7 @@ function joinChat(id) {
           return;
         }
 
-        fetch("https://mpc.xplate.dev/api/getChatByName/" + id).then((res) => {
+        fetch(window.location.protocol + "//" + window.location.hostname +"/api/getChatByName/" + id).then((res) => {
           if (res.ok) {
             res.text().then((txt) => {
               if (usernameInput.value !== "") {
@@ -63,8 +63,7 @@ if (signupCaptcha != null) {
     console.log("error event", { error: e.error });
   });
 }
-
-fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
+fetch(window.location.protocol + "//" + window.location.hostname +"/api/getRoomsAndPeopleInThem").then((res) => {
   if (res.ok) {
     res.json().then((data) => {
       //const parsed = JSON.parse(data);
