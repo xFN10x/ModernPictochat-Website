@@ -13,6 +13,9 @@ const messageList = document.getElementById("messageList");
  * @type {boolean}
  */
 var messageSending;
+/**
+ * @type {string}
+ */
 var ourID;
 
 //connect with websocket
@@ -298,4 +301,59 @@ function makeChatLeaveNotifElement(username) {
           </li>`;
   messageList?.insertAdjacentHTML("afterbegin", html);
   return true;
+}
+
+function onEnter() {
+  /**
+   * @type {HTMLCanvasElement}
+   */
+  // @ts-ignore
+  var canvas = document.getElementById(`chatCanvas`);
+  var img = new Image(canvas?.width, canvas?.height);
+  img.src = canvas.toDataURL("image/png");
+
+  var targetImg = new Image();
+
+  const setAttribute = img.setAttribute;
+  // override setAttribte
+  img.setAttribute = (key, value) => {
+    if (key === "cropped") {
+      if (
+        !makeChatHtmlElement(
+          // @ts-ignore
+          localStorage.getItem(`name`),
+          // @ts-ignore
+          targetImg.src,
+          true
+        )
+      ) {
+        return;
+      }
+
+      const json = JSON.stringify({
+        messageType: 1,
+        data: JSON.stringify({
+          data: targetImg.src,
+          id: ourID,
+        }),
+      });
+      console.log(json);
+      socket.send(json);
+    }
+  };
+
+  // @ts-ignore
+  autocrop(
+    img,
+    targetImg,
+    `{
+    bgColor: '#FFFFFF',
+    alphaTolerance: 20,
+    colorTolerance: 20,
+    invertTolerance: 0.90,
+    margin: '2%',
+    allowInvert: true,
+    marker: 'cropped'
+}`
+  );
 }

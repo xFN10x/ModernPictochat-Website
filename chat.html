@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script async defer src="js/chatDrawing.js"></script>
     <script src="js/autocrop.js"></script>
+    <script async defer src="js/chatDrawing.js"></script>
     <script>
       //check if there is a username before loading the rest
       if (
@@ -76,7 +76,7 @@
       }
 
       li > img {
-        aspect-ratio: 16/9;
+
         object-fit: contain;
         width: 100%;
         max-width: 30rem;
@@ -205,20 +205,7 @@
             />
             <img
               id="enterImg"
-              onclick="
-              if (!makeChatHtmlElement(localStorage.getItem(`name`), document.getElementById(`chatCanvas`).toDataURL(), true))
-              return;
-            console.log(`our id: ${ourID}`)
-              const json = JSON.stringify({
-                messageType:1,
-                data: JSON.stringify({
-                  data: document.getElementById(`chatCanvas`).toDataURL('image/png'),
-                  id: ourID
-                }) 
-              })
-              console.log(json)
-              socket.send(json)
-              "
+              onclick="onEnter()"
               onmouseenter="document.getElementById(`enterImg`).src = `enter-pressed.png`"
               onmouseleave="document.getElementById(`enterImg`).src = `enter.png`"
               style="
