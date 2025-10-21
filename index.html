@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@hcaptcha/vanilla-hcaptcha"
+      async
+      defer
+    ></script>
     <script async defer src="js/mainPage.js"></script>
     <meta http-equiv="Content-Type" content="text/html" />
     <meta name="author" content="xFN10x" />
@@ -12,15 +17,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=BBH+Sans+Bartle&display=swap"
+      href="https://fonts.googleapis.com/css2?family=BBH+Sans+Bartle&family=Fredoka:wght@300..700&display=swap"
       rel="stylesheet"
     />
 
     <style>
+      h1 {
+        font-size: 3rem;
+        margin: 0.7rem;
+        -webkit-text-stroke-width: 1px;
+        -webkit-text-fill-color: white;
+        -webkit-text-stroke-color: rgb(0, 0, 0);
+      }
+
       h1,
       h2,
       h3,
@@ -28,6 +37,8 @@
       h5,
       h6,
       p,
+      text,
+      label,
       .noto-sans {
         font-family: "Noto Sans", sans-serif;
         font-optical-sizing: auto;
@@ -40,6 +51,17 @@
         font-family: "BBH Sans Bartle", sans-serif;
         font-weight: 400;
         font-style: normal;
+      }
+
+      .signInDiv > * {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 20rem;
+        justify-content: center;
+        text-align: center;
+        min-height: 1.2rem;
+        margin: 0.2rem 0;
       }
     </style>
   </head>
@@ -54,25 +76,30 @@
       );
     "
   >
-    <h1 style="text-align: center">Modern Pictochat</h1>
-    <h3 style="text-align: center; margin-bottom: 0">
+    <h1 style="text-align: center; margin-bottom: 0.2rem">Modern Pictochat</h1>
+    <h3 style="text-align: center; margin-top: 0.1rem">
       Pictochat in the web, made for modern devices!
     </h3>
-    <div style="display: flex; justify-content: center; margin: 1rem">
-      <script
-        src="https://cdn.jsdelivr.net/npm/@hcaptcha/vanilla-hcaptcha"
-        async
-        defer
-      ></script>
-      <h-captcha
-        id="signupCaptcha"
-        site-key="93d0a366-6982-4558-a108-62a03b96ce24"
-        host="mpc.xplate.dev"
-        size="normal"
-        theme="dark"
-        tabindex="0"
-      ></h-captcha>
-      <input id="usernameInput" placeholder="Username" style="margin-left: 0.6rem; max-height: 1rem;" />
+    <div class="signInDiv" style="padding: 0 20%; display: flex; flex-direction: column; align-items: center;">
+      <input
+        id="usernameInput"
+        placeholder="Username"
+        style="margin-left: 0.6rem; max-height: 1rem"
+      />
+      <div style="display: flex">
+        <input type="color" id="accentInput" name="accentInput" />
+        <label for="accentInput">&nbsp;Accent Colour</label>
+      </div>
+      <div style="display: flex; justify-content: center">
+        <h-captcha
+          id="signupCaptcha"
+          site-key="93d0a366-6982-4558-a108-62a03b96ce24"
+          host="mpc.xplate.dev"
+          size="normal"
+          theme="dark"
+          tabindex="0"
+        ></h-captcha>
+      </div>
     </div>
     <div style="justify-content: center; display: flex">
       <div

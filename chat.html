@@ -2,6 +2,7 @@
 <html>
   <head>
     <script async defer src="js/chatDrawing.js"></script>
+    <script src="js/autocrop.js"></script>
     <script>
       //check if there is a username before loading the rest
       if (
@@ -11,7 +12,7 @@
         window.location.href = "/";
       //check to see if there is someone in the same chat with the same username
       fetch(
-        `https://mpc.xplate.dev/api/isPersonInChat/${new URLSearchParams(
+        window.location.protocol + "//" + window.location.hostname + (window.location.port !== "" ? ":" + window.location.port : "" ) +`/api/isPersonInChat/${new URLSearchParams(
           window.location.search
         ).get("join")}/${localStorage.getItem("name")}`
       ).then((res) => {
@@ -55,6 +56,10 @@
         background-position: 0 0;
         background-size: 1.1rem;
         background-repeat: no-repeat;
+      }
+
+      img {
+        image-rendering: pixelated;
       }
 
       ul {
@@ -207,7 +212,7 @@
               const json = JSON.stringify({
                 messageType:1,
                 data: JSON.stringify({
-                  data: document.getElementById(`chatCanvas`).toDataURL(),
+                  data: document.getElementById(`chatCanvas`).toDataURL('image/png'),
                   id: ourID
                 }) 
               })

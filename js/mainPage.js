@@ -21,13 +21,20 @@ if (
  */
 function joinChat(id) {
   var capchaValid = false;
-  fetch(window.location.protocol + "//" + window.location.hostname +"/api/capchaValid", {
-    method: "POST",
-    body: captChaKey,
-    headers: {
-      "Content-type": "text/plain; charset=UTF-8",
-    },
-  }).then((res) => {
+  fetch(
+    window.location.protocol +
+      "//" +
+      window.location.hostname +
+      (window.location.port !== "" ? ":" + window.location.port : "") +
+      "/api/capchaValid",
+    {
+      method: "POST",
+      body: captChaKey,
+      headers: {
+        "Content-type": "text/plain; charset=UTF-8",
+      },
+    }
+  ).then((res) => {
     if (res.ok) {
       res.json().then((val) => {
         console.log("Got captchaValid body: " + val.success);
@@ -37,14 +44,21 @@ function joinChat(id) {
           return;
         }
 
-        fetch(window.location.protocol + "//" + window.location.hostname +"/api/getChatByName/" + id).then((res) => {
+        fetch(
+          window.location.protocol +
+            "//" +
+            window.location.hostname +
+            (window.location.port !== "" ? ":" + window.location.port : "") +
+            "/api/getChatByName/" +
+            id
+        ).then((res) => {
           if (res.ok) {
             res.text().then((txt) => {
               if (usernameInput.value !== "") {
                 localStorage.setItem("name", usernameInput.value);
                 window.location.href = "chat?join=" + txt;
               } else {
-                console.warn("No username")
+                console.warn("No username");
               }
             });
           }
@@ -63,7 +77,14 @@ if (signupCaptcha != null) {
     console.log("error event", { error: e.error });
   });
 }
-fetch(window.location.protocol + "//" + window.location.hostname +"/api/getRoomsAndPeopleInThem").then((res) => {
+
+fetch(
+  window.location.protocol +
+    "//" +
+    window.location.hostname +
+    (window.location.port !== "" ? ":" + window.location.port : "") +
+    "/api/getRoomsAndPeopleInThem"
+).then((res) => {
   if (res.ok) {
     res.json().then((data) => {
       //const parsed = JSON.parse(data);

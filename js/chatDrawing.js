@@ -93,7 +93,13 @@ socket.addEventListener("open", (event) => {
 });
 
 function reloadChats() {
-  fetch("https://mpc.xplate.dev/api/getRoomsAndPeopleInThem").then((res) => {
+  fetch(
+    window.location.protocol +
+      "//" +
+      window.location.hostname +
+      (window.location.port !== "" ? ":" + window.location.port : "") +
+      "/api/getRoomsAndPeopleInThem"
+  ).then((res) => {
     if (res.ok) {
       res.json().then((data) => {
         //const parsed = JSON.parse(data);
@@ -167,39 +173,71 @@ if (drawingCanvas != null) {
   const ctx = drawingCanvas.getContext("2d");
   var beingHeld = false;
   /**
-   * @type {number}
+   * @type {number | null}}
    */
   var mousePositionX;
   /**
-   * @type {number}
+   * @type {number | null}
    */
   var mousePositionY;
 
-  function moved() {
-    // @ts-ignore
-    var setIntervalId = setInterval(() => {
-      if (beingHeld)
-        ctx.fillRect(mousePositionX, mousePositionY, brushSize, brushSize);
-    }, 0);
-  }
-
-  drawingCanvas.addEventListener("mousedown", function () {
+  drawingCanvas.addEventListener("mousedown", function (e) {
     beingHeld = true;
+    drawLine(
+      ctx,
+      e.offsetX + 0.01,
+      e.offsetY / 1.12,
+      e.offsetX - 0.01,
+      e.offsetY / 1.12
+    );
   });
-  drawingCanvas.addEventListener("mouseup", function () {
+  document.addEventListener("mouseup", function () {
     beingHeld = false;
   });
   drawingCanvas.addEventListener("mouseleave", function () {
-    beingHeld = false;
+    mousePositionY = null;
+    mousePositionX = null;
   });
   drawingCanvas.addEventListener("mousemove", function (e) {
-    mousePositionX = e.offsetX;
-    mousePositionY = e.offsetY / 1.12;
-    //console.log(ctx.canvas.width + " : " + e.offsetX);
-    //console.log(ctx.canvas.height + " : " + e.offsetY);
-
-    moved();
+    if (beingHeld) {
+      if (mousePositionX == null) {
+        mousePositionX = e.offsetX;
+      }
+      if (mousePositionY == null) {
+        mousePositionY = e.offsetY / 1.12;
+      }
+      drawLine(
+        ctx,
+        mousePositionX,
+        mousePositionY,
+        e.offsetX,
+        e.offsetY / 1.12
+      );
+      mousePositionX = e.offsetX;
+      mousePositionY = e.offsetY / 1.12;
+    } else {
+      mousePositionY = null;
+      mousePositionX = null;
+    }
   });
+
+  /**
+   * @param {{ beginPath: () => void; strokeStyle: any; lineWidth: any; lineJoin: string; moveTo: (arg0: any, arg1: any) => void; lineTo: (arg0: any, arg1: any) => void; closePath: () => void; stroke: () => void; }} context
+   * @param {any} x1
+   * @param {any} y1
+   * @param {any} x2
+   * @param {any} y2
+   */
+  function drawLine(context, x1, y1, x2, y2) {
+    context.beginPath();
+    context.strokeStyle = "#000000";
+    context.lineWidth = 5;
+    context.lineJoin = "round";
+    context.moveTo(x1, y1);
+    context.lineTo(x2, y2);
+    context.closePath();
+    context.stroke();
+  }
 }
 
 reloadChats();
