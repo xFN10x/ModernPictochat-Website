@@ -36,8 +36,8 @@ window.addEventListener("unload", () => {
 
 // @ts-ignore
 socket.onclose = (ev) => {
-  makeErrorNotifElement("Socket closed.")
-}
+  makeErrorNotifElement("(Socket closed.)");
+};
 // @ts-ignore
 socket.onerror = (event) => {
   var reason;
@@ -100,18 +100,18 @@ socket.onmessage = (
     reloadChats();
   } else if (Object.hasOwn(data, "id")) {
     ourID = data.id;
-  } else if (Object.hasOwn(data, "type") && Object.hasOwn(data, "username")) {
+  } else if (Object.hasOwn(data, "type") && Object.hasOwn(data, "user")) {
     switch (data.type) {
       case 2:
-        makeChatHtmlElement(data.username, data.data, false);
+        makeChatHtmlElement(data.user.username, data.data, false);
         break;
 
       case 0:
-        makeChatJoinNotifElement(data.username);
+        makeChatJoinNotifElement(data.user.username);
         break;
 
       case 1:
-        makeChatLeaveNotifElement(data.username);
+        makeChatLeaveNotifElement(data.user.username);
         break;
 
       default:
@@ -211,7 +211,7 @@ function reloadChats() {
             ><sup>${data[key].peopleCurrently}/${data[key].maxPeople}</sup></i
           >
           <div style="display: flex; padding: 5px; justify-content: right">
-            <button>Join!</button>
+            <button onclick="joinChat('${data[key].name}')">Join!</button>
           </div>
         </div>`;
           // @ts-ignore
@@ -225,6 +225,66 @@ function reloadChats() {
           // @ts-ignore
           statusText.innerHTML = `<i>${peopleOn} people are online in ${chatsOpen} chats.</i>`;
         else console.error("No status text!");
+      });
+    }
+  });
+}
+
+/**
+ * @param {string} id
+ */
+function joinChat(id) {
+  var capchaValid = false;
+  fetch(
+    window.location.protocol +
+      "//" +
+      window.location.hostname +
+      (window.location.port !== "" ? ":" + window.location.port : "") +
+      "/api/capchaValid",
+    {
+      method: "POST",
+      body: captChaKey,
+      headers: {
+        "Content-type": "text/plain; charset=UTF-8",
+      },
+    }
+  ).then((res) => {
+    if (res.ok) {
+      res.json().then((val) => {
+        console.log("Got captchaValid body: " + val.success);
+
+        if (!val.success) {
+          console.error("Captcha isnt valid; cannot join.");
+          return;
+        }
+
+        fetch(
+          window.location.protocol +
+            "//" +
+            window.location.hostname +
+            (window.location.port !== "" ? ":" + window.location.port : "") +
+            "/api/getChatByName/" +
+            id
+        ).then((res) => {
+          if (res.ok) {
+            res.text().then((txt) => {
+              socket.send(
+                JSON.stringify({
+                  messageType: 0,
+                  data: JSON.stringify({
+                    roomID: id,
+                    user: {
+                      username: localStorage.getItem("name"),
+                      iconData: defaultIcon,
+                      messagesSent: 0,
+                      rgb: "#000000",
+                    },
+                  }),
+                })
+              );
+            });
+          }
+        });
       });
     }
   });
@@ -339,7 +399,6 @@ function makeChatJoinNotifElement(username) {
             style="
               background-color: greenyellow;
               background-image: url(player-entered.png);
-              height: 1.2rem;
             "
           >
             User connected: <b>${username}</b>
@@ -356,7 +415,6 @@ function makeChatLeaveNotifElement(username) {
             style="
               background-color: rgb(255, 47, 47);
               background-image: url(player-left.png);
-              height: 1.2rem;
             "
           >
             User left: <b>${username}</b>
@@ -373,7 +431,6 @@ function makeErrorNotifElement(extra) {
             style="
               background-color: rgb(255, 47, 47);
               background-image: url(error.png);
-              height: 1.2rem;
             "
           >
             An error occured! Please try to join another room. ${extra}
