@@ -20,7 +20,13 @@ var ourID;
 
 //connect with websocket
 
-const socket = new WebSocket("wss://mpc.xplate.dev/ws");
+const socket = new WebSocket(
+  window.location.protocol +
+    "//" +
+    window.location.hostname +
+    (window.location.port !== "" ? ":" + window.location.port : "") +
+    "/ws"
+);
 window.addEventListener("unload", () => {
   socket.send("close");
 });
@@ -225,11 +231,11 @@ if (drawingCanvas != null) {
   });
 
   /**
-   * @param {{ beginPath: () => void; strokeStyle: any; lineWidth: any; lineJoin: string; moveTo: (arg0: any, arg1: any) => void; lineTo: (arg0: any, arg1: any) => void; closePath: () => void; stroke: () => void; }} context
-   * @param {any} x1
-   * @param {any} y1
-   * @param {any} x2
-   * @param {any} y2
+   * @param {CanvasRenderingContext2D} context
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
    */
   function drawLine(context, x1, y1, x2, y2) {
     context.beginPath();
