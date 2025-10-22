@@ -12,9 +12,13 @@
         window.location.href = "/";
       //check to see if there is someone in the same chat with the same username
       fetch(
-        window.location.protocol + "//" + window.location.hostname + (window.location.port !== "" ? ":" + window.location.port : "" ) +`/api/isPersonInChat/${new URLSearchParams(
-          window.location.search
-        ).get("join")}/${localStorage.getItem("name")}`
+        window.location.protocol +
+          "//" +
+          window.location.hostname +
+          (window.location.port !== "" ? ":" + window.location.port : "") +
+          `/api/isPersonInChat/${new URLSearchParams(
+            window.location.search
+          ).get("join")}/${localStorage.getItem("name")}`
       ).then((res) => {
         if (res.ok) {
           res.text().then((text) => {
@@ -76,7 +80,6 @@
       }
 
       li > img {
-
         object-fit: contain;
         width: 100%;
         max-width: 30rem;
@@ -110,7 +113,10 @@
   <body
     style="
       overflow: hidden;
-      background: #dbdbdb;
+      height: 100dvh;
+      width: 100dvw;
+      margin: 0;
+      display: flex;
       background: linear-gradient(
         90deg,
         rgba(219, 219, 219, 1) 0%,
@@ -118,7 +124,7 @@
       );
     "
   >
-    <div style="display: flex; margin: 1rem">
+    <div style="display: flex; width: 100%; margin: 0.6rem">
       <div
         id="chatDiv"
         style="
@@ -127,7 +133,6 @@
           background-color: white;
           border: 0.3rem solid black;
           margin-right: 0.5rem;
-          min-height: 90vh;
         "
       >
         <ul
@@ -141,6 +146,7 @@
             overflow-y: scroll;
             overflow-x: hidden;
             list-style: none;
+            margin-bottom: 0;
           "
         >
           <template
@@ -151,7 +157,7 @@
             "
           >
             User connected: <b>USER</b>
-    </template>
+          </template>
           <template
             style="
               background-color: rgb(255, 47, 47);
@@ -180,9 +186,7 @@
               background-color: white;
               border: 3px solid #d3d3d3;
               aspect-ratio: 16/9;
-              max-width: 100%;
-              height: 100%;
-              max-height: 100%;
+              height: 168.75px;
               margin: 1rem 0;
             "
           ></canvas>
@@ -224,6 +228,8 @@
       <div
         id="chatsDisplay"
         style="
+          overflow-x: clip;
+          overflow-y: auto;
           max-width: 8rem;
           padding: 1rem 1rem;
           background-color: white;

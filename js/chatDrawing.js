@@ -7,6 +7,9 @@ const statusText = document.getElementById("status-text");
 
 const brushSize = 3;
 
+const defaultIcon =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0BAMAAAA5+MK5AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAeUExURQAAAAMDA+/v7/////T09BAQEPr6+vn5+fX19f7+/sOgV/8AAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAFBhaW50Lk5FVCA1LjEuOWxu2j4AAAC2ZVhJZklJKgAIAAAABQAaAQUAAQAAAEoAAAAbAQUAAQAAAFIAAAAoAQMAAQAAAAIAAAAxAQIAEAAAAFoAAABphwQAAQAAAGoAAAAAAAAAYAAAAAEAAABgAAAAAQAAAFBhaW50Lk5FVCA1LjEuOQADAACQBwAEAAAAMDIzMAGgAwABAAAAAQAAAAWgBAABAAAAlAAAAAAAAAACAAEAAgAEAAAAUjk4AAIABwAEAAAAMDEwMAAAAABMz8BIJY/XoAAAAjpJREFUeNrt20ENQjEQRdFvAQtYqAUsYAELWMACbtmTvMUk/dBMz913pqf7HseSXVL/vhg6Ojo6Ojo6Ojo6Ojo6Ojo6Onrz0NHR0ZuHjo6O3jx0dHT05qGjo6M3Dx0dHb156Ojo6Od3bRI6Ojo6Ojo6eoPQ0dHR0dHR0RuEjo6Ojo6Ojt4gdHR0dHR0dPQGoaOjo6Ojo6M3CB0dHb1KH6k4apT7xSh0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR09O70W+qeeqTifeOoZ+qVQkdHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dH/24sGTo6Ojo6Ojo6Ojo6Ojo6+nqho6Ojo6Ojo6Ojo6Ojo6OvFzo6Ojo6Ojo6Ojo6Ojo6+nqhn0uvV4fEUe8UOjo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ovq29Hhi4pvE6svR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0belz1xSrv4zBB0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR19W3p9+8TQ0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dElSZIkSZIkSZIkSZIkSZIkSZJW7gO8gusn2MJ+5wAAAABJRU5ErkJggg==";
+
 const urlSearchParams = new URLSearchParams(window.location.search);
 const messageList = document.getElementById("messageList");
 /**
@@ -32,7 +35,55 @@ window.addEventListener("unload", () => {
 });
 
 // @ts-ignore
+socket.onclose = (ev) => {
+  makeErrorNotifElement("Socket closed.")
+}
+// @ts-ignore
+socket.onerror = (event) => {
+  var reason;
+  if (event.code == 1000)
+    reason =
+      "Normal closure, meaning that the purpose for which the connection was established has been fulfilled.";
+  else if (event.code == 1001)
+    reason =
+      'An endpoint is "going away", such as a server going down or a browser having navigated away from a page.';
+  else if (event.code == 1002)
+    reason =
+      "An endpoint is terminating the connection due to a protocol error";
+  else if (event.code == 1003)
+    reason =
+      "An endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).";
+  else if (event.code == 1004)
+    reason = "Reserved. The specific meaning might be defined in the future.";
+  else if (event.code == 1005) reason = "No status code was actually present.";
+  else if (event.code == 1006)
+    reason =
+      "The connection was closed abnormally, e.g., without sending or receiving a Close control frame";
+  else if (event.code == 1007)
+    reason =
+      "An endpoint is terminating the connection because it has received data within a message that was not consistent with the type of the message (e.g., non-UTF-8 [https://www.rfc-editor.org/rfc/rfc3629] data within a text message).";
+  else if (event.code == 1008)
+    reason =
+      'An endpoint is terminating the connection because it has received a message that "violates its policy". This reason is given either if there is no other sutible reason, or if there is a need to hide specific details about the policy.';
+  else if (event.code == 1009)
+    reason =
+      "An endpoint is terminating the connection because it has received a message that is too big for it to process.";
+  else if (event.code == 1010)
+    // Note that this status code is not used by the server, because it can fail the WebSocket handshake instead.
+    reason =
+      "An endpoint (client) is terminating the connection because it has expected the server to negotiate one or more extension, but the server didn't return them in the response message of the WebSocket handshake. <br /> Specifically, the extensions that are needed are: " +
+      event.reason;
+  else if (event.code == 1011)
+    reason =
+      "A server is terminating the connection because it encountered an unexpected condition that prevented it from fulfilling the request.";
+  else if (event.code == 1015)
+    reason =
+      "The connection was closed due to a failure to perform a TLS handshake (e.g., the server certificate can't be verified).";
+  else reason = "Unknown reason";
+  makeErrorNotifElement(event.reason);
+};
 
+// @ts-ignore
 socket.onmessage = (
   /**
    * @type {MessageEvent}
@@ -94,7 +145,12 @@ socket.addEventListener("open", (event) => {
         messageType: 0,
         data: JSON.stringify({
           roomID: urlSearchParams.get("join"),
-          username: localStorage.getItem("name"),
+          user: {
+            username: localStorage.getItem("name"),
+            iconData: defaultIcon,
+            messagesSent: 0,
+            rgb: "#000000",
+          },
         }),
       })
     );
@@ -304,6 +360,23 @@ function makeChatLeaveNotifElement(username) {
             "
           >
             User left: <b>${username}</b>
+          </li>`;
+  messageList?.insertAdjacentHTML("afterbegin", html);
+  return true;
+}
+
+/**
+ * @param {string} extra
+ */
+function makeErrorNotifElement(extra) {
+  const html = `<li
+            style="
+              background-color: rgb(255, 47, 47);
+              background-image: url(error.png);
+              height: 1.2rem;
+            "
+          >
+            An error occured! Please try to join another room. ${extra}
           </li>`;
   messageList?.insertAdjacentHTML("afterbegin", html);
   return true;
