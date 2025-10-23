@@ -98,6 +98,28 @@ socket.onmessage = (
   console.log("Got message: " + data);
   if (data == "reloadChats") {
     reloadChats();
+  } else if (data == "Verified") {
+    setInterval(function () {
+      socket.send("ping");
+    }, 5000);
+    if (urlSearchParams.has("join")) {
+      socket.send(
+        JSON.stringify({
+          messageType: 0,
+          data: JSON.stringify({
+            roomID: urlSearchParams.get("join"),
+            user: {
+              username: localStorage.getItem("name"),
+              iconData: defaultIcon,
+              messagesSent: 0,
+              rgb: "#000000",
+            },
+          }),
+        })
+      );
+    }
+  } else if (data == "goBack") {
+    window.location.href = "/";
   } else if (Object.hasOwn(data, "id")) {
     ourID = data.id;
   } else if (Object.hasOwn(data, "type") && Object.hasOwn(data, "user")) {
@@ -134,26 +156,10 @@ socket.onmessage = (
     }
   }
 };
-
+var authed = false;
 socket.addEventListener("open", (event) => {
-  setInterval(function () {
-    socket.send("ping");
-  }, 5000);
-  if (urlSearchParams.has("join")) {
-    socket.send(
-      JSON.stringify({
-        messageType: 0,
-        data: JSON.stringify({
-          roomID: urlSearchParams.get("join"),
-          user: {
-            username: localStorage.getItem("name"),
-            iconData: defaultIcon,
-            messagesSent: 0,
-            rgb: "#000000",
-          },
-        }),
-      })
-    );
+  if (!authed && urlSearchParams.has("key")) {
+    socket.send("HANDSHAKE " + urlSearchParams.get("key"));
   }
 });
 
@@ -272,7 +278,7 @@ function joinChat(id) {
           JSON.stringify({
             messageType: 0,
             data: JSON.stringify({
-              roomID: id,
+              roomID: txt,
               user: {
                 username: localStorage.getItem("name"),
                 iconData: defaultIcon,

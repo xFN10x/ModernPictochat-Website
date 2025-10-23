@@ -20,7 +20,7 @@ if (
  * @param {string} id
  */
 function joinChat(id) {
-  var capchaValid = false;
+  /*var capchaValid = false;
   fetch(
     window.location.protocol +
       "//" +
@@ -43,30 +43,30 @@ function joinChat(id) {
           console.error("Captcha isnt valid; cannot join.");
           return;
         }
-
-        fetch(
-          window.location.protocol +
-            "//" +
-            window.location.hostname +
-            (window.location.port !== "" ? ":" + window.location.port : "") +
-            "/api/getChatByName/" +
-            id
-        ).then((res) => {
-          if (res.ok) {
-            res.text().then((txt) => {
-              if (usernameInput.value !== "") {
-                localStorage.setItem("name", usernameInput.value);
-                window.location.href = "chat?join=" + txt;
-              } else {
-                console.warn("No username");
-              }
-            });
-          }
-        });
+*/
+  fetch(
+    window.location.protocol +
+      "//" +
+      window.location.hostname +
+      (window.location.port !== "" ? ":" + window.location.port : "") +
+      "/api/getChatByName/" +
+      id
+  ).then((res) => {
+    if (res.ok) {
+      res.text().then((txt) => {
+        if (usernameInput.value !== "" && captChaKey != null) {
+          localStorage.setItem("name", usernameInput.value);
+          window.location.href = "chat?join=" + txt + "&key=" + captChaKey;
+        } else {
+          console.warn("No username/ No Captcha");
+        }
       });
     }
   });
-}
+} /*);
+    }
+  });
+}*/
 
 if (signupCaptcha != null) {
   signupCaptcha.addEventListener("verified", (e) => {
