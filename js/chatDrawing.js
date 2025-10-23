@@ -234,7 +234,7 @@ function reloadChats() {
  * @param {string} id
  */
 function joinChat(id) {
-  var capchaValid = false;
+  /*var capchaValid = false;
   fetch(
     window.location.protocol +
       "//" +
@@ -257,38 +257,38 @@ function joinChat(id) {
           console.error("Captcha isnt valid; cannot join.");
           return;
         }
-
-        fetch(
-          window.location.protocol +
-            "//" +
-            window.location.hostname +
-            (window.location.port !== "" ? ":" + window.location.port : "") +
-            "/api/getChatByName/" +
-            id
-        ).then((res) => {
-          if (res.ok) {
-            res.text().then((txt) => {
-              socket.send(
-                JSON.stringify({
-                  messageType: 0,
-                  data: JSON.stringify({
-                    roomID: id,
-                    user: {
-                      username: localStorage.getItem("name"),
-                      iconData: defaultIcon,
-                      messagesSent: 0,
-                      rgb: "#000000",
-                    },
-                  }),
-                })
-              );
-            });
-          }
-        });
+*/
+  fetch(
+    window.location.protocol +
+      "//" +
+      window.location.hostname +
+      (window.location.port !== "" ? ":" + window.location.port : "") +
+      "/api/getChatByName/" +
+      id
+  ).then((res) => {
+    if (res.ok) {
+      res.text().then((txt) => {
+        socket.send(
+          JSON.stringify({
+            messageType: 0,
+            data: JSON.stringify({
+              roomID: id,
+              user: {
+                username: localStorage.getItem("name"),
+                iconData: defaultIcon,
+                messagesSent: 0,
+                rgb: "#000000",
+              },
+            }),
+          })
+        );
       });
     }
   });
-}
+} /*);
+    }
+  });
+}*/
 
 if (drawingCanvas != null) {
   /**
