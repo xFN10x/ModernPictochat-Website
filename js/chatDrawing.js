@@ -1,4 +1,70 @@
 //@ts-check
+
+class LinkedNode {
+  /**
+   * @param {any} value
+   */
+  constructor(value) {
+    this.value = value;
+    this.next = null;
+  }
+}
+class LinkedList {
+  constructor() {
+    this.head = null;
+  }
+  /**
+   * @param {any} value
+   */
+  append(value) {
+    let newnode = new LinkedNode(value);
+    if (!this.head) {
+      this.head = newnode;
+      return;
+    }
+    let current = this.head;
+    while (current.next) {
+      current = current.next;
+    }
+    current.next = newnode;
+  }
+  getLast() {
+    let current = this.head;
+    let lastCurrent = this.head;
+    let result = "";
+    while (current) {
+      lastCurrent = current;
+      result += current.value + "->";
+      current = current.next;
+    }
+    return lastCurrent.value;
+  }
+  /**
+   * @param {any} value
+   */
+  delete(value) {
+    if (!this.head) {
+      console.log("list is empty no element to delete");
+      return;
+    }
+    if (this.head.value === value) {
+      this.head = this.head.next;
+      return;
+    }
+    let prev = null;
+    let current = this.head;
+    while (current && current.value !== value) {
+      prev = current;
+      current = current.next;
+    }
+    if (!current) {
+      console.log("value is not found in list");
+      return;
+    }
+    prev.next = current.next;
+  }
+}
+
 const drawingCanvas = document.getElementById("chatCanvas");
 // @ts-ignore
 const chatsDisplay = document.getElementById("chatsDisplay");
@@ -7,6 +73,7 @@ const statusText = document.getElementById("status-text");
 
 const brushSize = 3;
 
+// @ts-ignore
 const defaultIcon =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0BAMAAAA5+MK5AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAeUExURQAAAAMDA+/v7/////T09BAQEPr6+vn5+fX19f7+/sOgV/8AAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAFBhaW50Lk5FVCA1LjEuOWxu2j4AAAC2ZVhJZklJKgAIAAAABQAaAQUAAQAAAEoAAAAbAQUAAQAAAFIAAAAoAQMAAQAAAAIAAAAxAQIAEAAAAFoAAABphwQAAQAAAGoAAAAAAAAAYAAAAAEAAABgAAAAAQAAAFBhaW50Lk5FVCA1LjEuOQADAACQBwAEAAAAMDIzMAGgAwABAAAAAQAAAAWgBAABAAAAlAAAAAAAAAACAAEAAgAEAAAAUjk4AAIABwAEAAAAMDEwMAAAAABMz8BIJY/XoAAAAjpJREFUeNrt20ENQjEQRdFvAQtYqAUsYAELWMACbtmTvMUk/dBMz913pqf7HseSXVL/vhg6Ojo6Ojo6Ojo6Ojo6Ojo6Onrz0NHR0ZuHjo6O3jx0dHT05qGjo6M3Dx0dHb156Ojo6Od3bRI6Ojo6Ojo6eoPQ0dHR0dHR0RuEjo6Ojo6Ojt4gdHR0dHR0dPQGoaOjo6Ojo6M3CB0dHb1KH6k4apT7xSh0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR09O70W+qeeqTifeOoZ+qVQkdHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dH/24sGTo6Ojo6Ojo6Ojo6Ojo6+nqho6Ojo6Ojo6Ojo6Ojo6OvFzo6Ojo6Ojo6Ojo6Ojo6+nqhn0uvV4fEUe8UOjo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ovq29Hhi4pvE6svR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0belz1xSrv4zBB0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR19W3p9+8TQ0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dElSZIkSZIkSZIkSZIkSZIkSZJW7gO8gusn2MJ+5wAAAABJRU5ErkJggg==";
 
@@ -120,12 +187,13 @@ socket.onmessage = (
                 messageType: 0,
                 data: JSON.stringify({
                   roomID: urlSearchParams.get("join"),
-                  user: {
-                    username: localStorage.getItem("name"),
+                  // @ts-ignore
+                  user: JSON.parse(localStorage.getItem("userInfo"))/*{
+                    username: ,
                     iconData: defaultIcon,
                     messagesSent: 0,
                     rgb: "#000000",
-                  },
+                  },*/
                 }),
               })
             );
@@ -144,15 +212,15 @@ socket.onmessage = (
   } else if (Object.hasOwn(data, "type") && Object.hasOwn(data, "user")) {
     switch (data.type) {
       case 2:
-        makeChatHtmlElement(data.user.username, data.data, false);
+        makeChatHtmlElement(data.user, data.data, false);
         break;
 
       case 0:
-        makeChatJoinNotifElement(data.user.username, data.chat.name);
+        makeChatJoinNotifElement(data.user, data.chat.name);
         break;
 
       case 1:
-        makeChatLeaveNotifElement(data.user.username, data.chat.name);
+        makeChatLeaveNotifElement(data.user, data.chat.name);
         break;
 
       default:
@@ -304,12 +372,8 @@ function joinChat(id) {
             messageType: 0,
             data: JSON.stringify({
               roomID: txt,
-              user: {
-                username: localStorage.getItem("name"),
-                iconData: defaultIcon,
-                messagesSent: 0,
-                rgb: "#000000",
-              },
+              // @ts-ignore
+              user: JSON.parse(localStorage.getItem("userInfo"))
             }),
           })
         );
@@ -394,23 +458,111 @@ if (drawingCanvas != null) {
     context.closePath();
     context.stroke();
   }
+  ctx.font = "25px Pictochat";
+  var currentTextLine = 1;
+  var lineX = 1;
+  let lineHeight = 20;
+  var widths = new LinkedList();
+  /**
+   * @param {string} text
+   */
+  function typeText(text) {
+    var mes = ctx.measureText(text);
+    if (lineX + mes.width > 290) {
+      lineX = 1;
+      currentTextLine++;
+    }
+
+    ctx.fillStyle = "#000000";
+    ctx.fillText(text, lineX, currentTextLine * lineHeight);
+
+    lineX += mes.width;
+    console.log(mes.width)
+    widths.append(mes.width)
+  }
+
+  document.onkeydown = function (e) {
+    if (e.key === "Enter") {
+      onEnter();
+      return;
+    }
+    if (e.key === "Backspace") {
+      return; //we can add this properly at some point later
+      ctx.fillStyle = "#ffffffff";
+      ctx.fillRect(
+        (lineX - widths.getLast()) - 1,
+        (currentTextLine - 1) * lineHeight,
+        widths.getLast() + 1,
+        lineHeight+ 2
+      );
+      lineX -= widths.getLast();
+      if (lineX <= 0 && currentTextLine > 1) {
+        lineX = 290;
+        currentTextLine--;
+      } else if (lineX <= 0 && currentTextLine <= 1) {
+        lineX = 1;
+        currentTextLine = 1;
+      }
+      console.log(widths.getLast())
+      widths.delete(widths.getLast())
+      return;
+    }
+    if (
+      !(
+        /*e.ctrlKey ||
+        e.metaKey ||
+        e.altKey ||
+        e.shiftKey ||*/
+        (
+          e.key === "CapsLock" ||
+          e.key === "Meta" ||
+          e.key === "Shift" ||
+          e.key === "Alt" ||
+          e.key === "Tab" ||
+          e.key === "F1" ||
+          e.key === "F2" ||
+          e.key === "F3" ||
+          e.key === "F4" ||
+          e.key === "F5" ||
+          e.key === "F6" ||
+          e.key === "F7" ||
+          e.key === "F8" ||
+          e.key === "F9" ||
+          e.key === "F10" ||
+          e.key === "F11" ||
+          e.key === "F12" ||
+          e.key === "F13" ||
+          e.key === "F14" ||
+          e.key === "F15"
+        )
+      )
+    )
+      typeText(e.key);
+  };
+
+  function clearCanvas() {
+    currentTextLine = 1;
+    lineX = 1;
+    // @ts-ignore
+    ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+  }
 }
 
 reloadChats();
 
 /**
- * @param {string} username
+ * @param {{username: string, iconData: string, messagesSent: number, rgb: string}} userInfo
  * @param {string} imageUri
  * @param {boolean} fromSelf
  */
-function makeChatHtmlElement(username, imageUri, fromSelf) {
+function makeChatHtmlElement(userInfo, imageUri, fromSelf) {
   if (messageSending) {
     console.error("Message already sending.");
     return false;
   }
   const html = `<li>
-            <b
-              >&lt;${username}&gt;
+            <b style="-webkit-text-fill-color: ${userInfo.rgb}"
+              >&lt;${userInfo.username}&gt;
               <i id="sendingText" style="font-size: 1rem; -webkit-text-fill-color: #adadad"
                 >${fromSelf ? "Sending..." : ""}</i
               ></b
@@ -423,11 +575,12 @@ function makeChatHtmlElement(username, imageUri, fromSelf) {
 }
 
 /**
- * @param {string} username
+ * @param {{username: string, iconData: string, messagesSent: number, rgb: string}} userInfo
  * @param {string} [chatName]
  */
-function makeChatJoinNotifElement(username, chatName) {
-  if (username === localStorage.getItem("name")) {
+function makeChatJoinNotifElement(userInfo, chatName) {
+  // @ts-ignore
+  if (userInfo.username === JSON.parse(localStorage.getItem("userInfo")).username) {
     var html = `<li
             style="
               background-color: greenyellow;
@@ -443,7 +596,7 @@ function makeChatJoinNotifElement(username, chatName) {
               background-image: url(player-entered.png);
             "
           >
-            User connected: <b>${username}</b>
+            User connected: <b style="-webkit-text-fill-color: ${userInfo.rgb}">${userInfo.username}</b>
           </li>`;
   }
   messageList?.insertAdjacentHTML("afterbegin", html);
@@ -451,11 +604,12 @@ function makeChatJoinNotifElement(username, chatName) {
 }
 
 /**
- * @param {string} username
+ * @param {{username: string, iconData: string, messagesSent: number, rgb: string}} userInfo
  * @param {string} [chatName]
  */
-function makeChatLeaveNotifElement(username, chatName) {
-  if (username === localStorage.getItem("name")) {
+function makeChatLeaveNotifElement(userInfo, chatName) {
+  // @ts-ignore
+  if (userInfo.username === JSON.parse(localStorage.getItem("userInfo")).username) {
     var html = `<li
             style="
               background-color: #ff0000;
@@ -471,7 +625,7 @@ function makeChatLeaveNotifElement(username, chatName) {
               background-image: url(player-left.png);
             "
           >
-            User Disconnected: <b>${username}</b>
+            User Disconnected: <b style="-webkit-text-fill-color: ${userInfo.rgb}">${userInfo.username}</b>
           </li>`;
   }
   messageList?.insertAdjacentHTML("afterbegin", html);
@@ -544,7 +698,7 @@ function onEnter() {
       if (
         !makeChatHtmlElement(
           // @ts-ignore
-          localStorage.getItem(`name`),
+          JSON.parse(localStorage.getItem(`userInfo`)),
           // @ts-ignore
           targetImg.src,
           true
@@ -562,6 +716,8 @@ function onEnter() {
       });
       console.log(json);
       socket.send(json);
+      // @ts-ignore
+      clearCanvas();
     }
   };
 

@@ -6,8 +6,8 @@
     <script>
       //check if there is a username before loading the rest
       if (
-        localStorage.getItem("name") == null ||
-        localStorage.getItem("name") === ""
+        JSON.parse(localStorage.getItem("userInfo")).username == null ||
+        JSON.parse(localStorage.getItem("userInfo")).username === ""
       )
         window.location.href = "/";
       //check to see if there is someone in the same chat with the same username
@@ -18,7 +18,7 @@
           (window.location.port !== "" ? ":" + window.location.port : "") +
           `/api/isPersonInChat/${new URLSearchParams(
             window.location.search
-          ).get("join")}/${localStorage.getItem("name")}`
+          ).get("join")}/${JSON.parse(localStorage.getItem("userInfo")).username}`
       ).then((res) => {
         if (res.ok) {
           res.text().then((text) => {
@@ -54,6 +54,7 @@
         font-family: "Pictochat";
         src: url("pictochat.otf.woff2");
       }
+      
       ul li {
         padding-left: 1.3rem;
         background-image: url("favicon.png");
@@ -207,7 +208,7 @@
               onmouseleave="document.getElementById(`clearImg`).src = `clear.png`"
               style="cursor: pointer; min-width: 3rem; max-width: 3rem"
               src="clear.png"
-              onclick="const canvas = document.getElementById(`chatCanvas`); canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)"
+              onclick="clearCanvas()"
             />
             <img
               id="enterImg"

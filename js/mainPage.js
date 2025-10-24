@@ -1,21 +1,43 @@
 // @ts-nocheck
+const defaultIcon =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0BAMAAAA5+MK5AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAeUExURQAAAAMDA+/v7/////T09BAQEPr6+vn5+fX19f7+/sOgV/8AAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAFBhaW50Lk5FVCA1LjEuOWxu2j4AAAC2ZVhJZklJKgAIAAAABQAaAQUAAQAAAEoAAAAbAQUAAQAAAFIAAAAoAQMAAQAAAAIAAAAxAQIAEAAAAFoAAABphwQAAQAAAGoAAAAAAAAAYAAAAAEAAABgAAAAAQAAAFBhaW50Lk5FVCA1LjEuOQADAACQBwAEAAAAMDIzMAGgAwABAAAAAQAAAAWgBAABAAAAlAAAAAAAAAACAAEAAgAEAAAAUjk4AAIABwAEAAAAMDEwMAAAAABMz8BIJY/XoAAAAjpJREFUeNrt20ENQjEQRdFvAQtYqAUsYAELWMACbtmTvMUk/dBMz913pqf7HseSXVL/vhg6Ojo6Ojo6Ojo6Ojo6Ojo6Onrz0NHR0ZuHjo6O3jx0dHT05qGjo6M3Dx0dHb156Ojo6Od3bRI6Ojo6Ojo6eoPQ0dHR0dHR0RuEjo6Ojo6Ojt4gdHR0dHR0dPQGoaOjo6Ojo6M3CB0dHb1KH6k4apT7xSh0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR09O70W+qeeqTifeOoZ+qVQkdHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dH/24sGTo6Ojo6Ojo6Ojo6Ojo6+nqho6Ojo6Ojo6Ojo6Ojo6OvFzo6Ojo6Ojo6Ojo6Ojo6+nqhn0uvV4fEUe8UOjo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojo6Ovq29Hhi4pvE6svR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0belz1xSrv4zBB0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR19W3p9+8TQ0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dElSZIkSZIkSZIkSZIkSZIkSZJW7gO8gusn2MJ+5wAAAABJRU5ErkJggg==";
 
 const statusText = document.getElementById("status-text");
 const chatsDisplay = document.getElementById("chatsDisplay");
 const signupCaptcha = document.getElementById("signupCaptcha");
+/**
+ * @type {HTMLInputElement}
+ */
 const usernameInput = document.getElementById("usernameInput");
+/**
+ * @type {HTMLInputElement}
+ */
+const colorInput = document.getElementById("accentInput");
 /**
  * @type {string | null}
  */
 var captChaKey = null;
 
 if (
-  localStorage.getItem("name") != null &&
-  localStorage.getItem("name") !== ""
+  JSON.parse(localStorage.getItem("userInfo")) != null &&
+  localStorage.getItem("userInfo") !== ""
 ) {
-  // @ts-ignore
-  usernameInput.value = localStorage.getItem("name");
+  if (
+    JSON.parse(localStorage.getItem("userInfo")).username != null &&
+    JSON.parse(localStorage.getItem("userInfo")).username !== ""
+  ) {
+    // @ts-ignore
+    usernameInput.value = JSON.parse(localStorage.getItem("userInfo")).username;
+  }
+
+  if (
+    JSON.parse(localStorage.getItem("userInfo")).rgb != null &&
+    JSON.parse(localStorage.getItem("userInfo")).rgb !== ""
+  ) {
+    colorInput.value = JSON.parse(localStorage.getItem("userInfo")).rgb;
+  }
 }
+
 /**
  * @param {string} id
  */
@@ -55,10 +77,18 @@ function joinChat(id) {
     if (res.ok) {
       res.text().then((txt) => {
         if (usernameInput.value !== "" && captChaKey != null) {
-          localStorage.setItem("name", usernameInput.value);
+          localStorage.setItem(
+            "userInfo",
+            JSON.stringify({
+              username: usernameInput.value,
+              rgb: colorInput.value,
+              iconData: defaultIcon,
+              messagesSent: 0,
+            })
+          );
           window.location.href = "chat?join=" + txt + "&key=" + captChaKey;
         } else {
-          console.warn("No username/ No Captcha");
+          console.warn("No username / No Captcha");
         }
       });
     }
