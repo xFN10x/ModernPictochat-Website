@@ -103,25 +103,44 @@ socket.onmessage = (
       socket.send("ping");
     }, 5000);
     if (urlSearchParams.has("join")) {
-      socket.send(
-        JSON.stringify({
-          messageType: 0,
-          data: JSON.stringify({
-            roomID: urlSearchParams.get("join"),
-            user: {
-              username: localStorage.getItem("name"),
-              iconData: defaultIcon,
-              messagesSent: 0,
-              rgb: "#000000",
-            },
-          }),
-        })
-      );
+      fetch(
+        window.location.protocol +
+          "//" +
+          window.location.hostname +
+          (window.location.port !== "" ? ":" + window.location.port : "") +
+          "/api/getChatById/" +
+          urlSearchParams.get("join")
+      ).then((res) => {
+        if (res.ok) {
+          res.text().then((val) => {
+            makeChatNotifElement(val);
+
+            socket.send(
+              JSON.stringify({
+                messageType: 0,
+                data: JSON.stringify({
+                  roomID: urlSearchParams.get("join"),
+                  user: {
+                    username: localStorage.getItem("name"),
+                    iconData: defaultIcon,
+                    messagesSent: 0,
+                    rgb: "#000000",
+                  },
+                }),
+              })
+            );
+          });
+        }
+      });
     }
   } else if (data == "goBack") {
     window.location.href = "/";
   } else if (Object.hasOwn(data, "id")) {
     ourID = data.id;
+  } else if (Object.hasOwn(data, "shownError")) {
+    makeErrorNotifElement(data.shownError);
+  } else if (Object.hasOwn(data, "shownMessage")) {
+    makeSilentNotifElement(data.shownMessage);
   } else if (Object.hasOwn(data, "type") && Object.hasOwn(data, "user")) {
     switch (data.type) {
       case 2:
@@ -129,11 +148,11 @@ socket.onmessage = (
         break;
 
       case 0:
-        makeChatJoinNotifElement(data.user.username);
+        makeChatJoinNotifElement(data.user.username, data.chat.name);
         break;
 
       case 1:
-        makeChatLeaveNotifElement(data.user.username);
+        makeChatLeaveNotifElement(data.user.username, data.chat.name);
         break;
 
       default:
@@ -276,6 +295,12 @@ function joinChat(id) {
       res.text().then((txt) => {
         socket.send(
           JSON.stringify({
+            messageType: 2,
+          })
+        );
+        makeChatNotifElement(id);
+        socket.send(
+          JSON.stringify({
             messageType: 0,
             data: JSON.stringify({
               roomID: txt,
@@ -399,9 +424,20 @@ function makeChatHtmlElement(username, imageUri, fromSelf) {
 
 /**
  * @param {string} username
+ * @param {string} [chatName]
  */
-function makeChatJoinNotifElement(username) {
-  const html = `<li
+function makeChatJoinNotifElement(username, chatName) {
+  if (username === localStorage.getItem("name")) {
+    var html = `<li
+            style="
+              background-color: greenyellow;
+              background-image: url(player-entered.png);
+            "
+          >
+            Connected to ${chatName}
+          </li>`;
+  } else {
+    var html = `<li
             style="
               background-color: greenyellow;
               background-image: url(player-entered.png);
@@ -409,22 +445,35 @@ function makeChatJoinNotifElement(username) {
           >
             User connected: <b>${username}</b>
           </li>`;
+  }
   messageList?.insertAdjacentHTML("afterbegin", html);
   return true;
 }
 
 /**
  * @param {string} username
+ * @param {string} [chatName]
  */
-function makeChatLeaveNotifElement(username) {
-  const html = `<li
+function makeChatLeaveNotifElement(username, chatName) {
+  if (username === localStorage.getItem("name")) {
+    var html = `<li
             style="
-              background-color: rgb(255, 47, 47);
+              background-color: #ff0000;
               background-image: url(player-left.png);
             "
           >
-            User left: <b>${username}</b>
+            Disconnected from ${chatName}
           </li>`;
+  } else {
+    var html = `<li
+            style="
+              background-color: #ff0000;
+              background-image: url(player-left.png);
+            "
+          >
+            User Disconnected: <b>${username}</b>
+          </li>`;
+  }
   messageList?.insertAdjacentHTML("afterbegin", html);
   return true;
 }
@@ -439,7 +488,39 @@ function makeErrorNotifElement(extra) {
               background-image: url(error.png);
             "
           >
-            An error occured! Please try to join another room. ${extra}
+            An error occured! ${extra}
+          </li>`;
+  messageList?.insertAdjacentHTML("afterbegin", html);
+  return true;
+}
+
+/**
+ * @param {string} extra
+ */
+function makeSilentNotifElement(extra) {
+  const html = `<li
+            style="
+              background-color: #aeaeae;
+              background-image: url(silentMessage.png);
+            "
+          >
+            ${extra}
+          </li>`;
+  messageList?.insertAdjacentHTML("afterbegin", html);
+  return true;
+}
+
+/**
+ * @param {string} chat
+ */
+function makeChatNotifElement(chat) {
+  const html = `<li
+            style="
+              background-color: #e7e7e7ff;
+              background-image: url(chatIcon.png);
+            "
+          >
+            Entering ${chat}...
           </li>`;
   messageList?.insertAdjacentHTML("afterbegin", html);
   return true;
