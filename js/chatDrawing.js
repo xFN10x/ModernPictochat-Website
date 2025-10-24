@@ -102,11 +102,13 @@ window.addEventListener("unload", () => {
 });
 
 // @ts-ignore
+// @ts-ignore
 socket.onclose = (ev) => {
   makeErrorNotifElement("(Socket closed.)");
 };
 // @ts-ignore
 socket.onerror = (event) => {
+  // @ts-ignore
   var reason;
   if (event.code == 1000)
     reason =
@@ -188,12 +190,12 @@ socket.onmessage = (
                 data: JSON.stringify({
                   roomID: urlSearchParams.get("join"),
                   // @ts-ignore
-                  user: JSON.parse(localStorage.getItem("userInfo"))/*{
+                  user: JSON.parse(localStorage.getItem("userInfo")) /*{
                     username: ,
                     iconData: defaultIcon,
                     messagesSent: 0,
                     rgb: "#000000",
-                  },*/
+                  },*/,
                 }),
               })
             );
@@ -244,6 +246,7 @@ socket.onmessage = (
   }
 };
 var authed = false;
+// @ts-ignore
 socket.addEventListener("open", (event) => {
   if (!authed && urlSearchParams.has("key")) {
     socket.send("HANDSHAKE " + urlSearchParams.get("key"));
@@ -327,30 +330,6 @@ function reloadChats() {
  * @param {string} id
  */
 function joinChat(id) {
-  /*var capchaValid = false;
-  fetch(
-    window.location.protocol +
-      "//" +
-      window.location.hostname +
-      (window.location.port !== "" ? ":" + window.location.port : "") +
-      "/api/capchaValid",
-    {
-      method: "POST",
-      body: captChaKey,
-      headers: {
-        "Content-type": "text/plain; charset=UTF-8",
-      },
-    }
-  ).then((res) => {
-    if (res.ok) {
-      res.json().then((val) => {
-        console.log("Got captchaValid body: " + val.success);
-
-        if (!val.success) {
-          console.error("Captcha isnt valid; cannot join.");
-          return;
-        }
-*/
   fetch(
     window.location.protocol +
       "//" +
@@ -373,17 +352,14 @@ function joinChat(id) {
             data: JSON.stringify({
               roomID: txt,
               // @ts-ignore
-              user: JSON.parse(localStorage.getItem("userInfo"))
+              user: JSON.parse(localStorage.getItem("userInfo")),
             }),
           })
         );
       });
     }
   });
-} /*);
-    }
-  });
-}*/
+}
 
 if (drawingCanvas != null) {
   /**
@@ -450,7 +426,8 @@ if (drawingCanvas != null) {
    */
   function drawLine(context, x1, y1, x2, y2) {
     context.beginPath();
-    context.strokeStyle = "#000000";
+    // @ts-ignore
+    context.strokeStyle = JSON.parse(localStorage.getItem("userInfo")).rgb;
     context.lineWidth = 5;
     context.lineJoin = "round";
     context.moveTo(x1, y1);
@@ -473,12 +450,13 @@ if (drawingCanvas != null) {
       currentTextLine++;
     }
 
-    ctx.fillStyle = "#000000";
+    // @ts-ignore
+    ctx.fillStyle = JSON.parse(localStorage.getItem("userInfo")).rgb;
     ctx.fillText(text, lineX, currentTextLine * lineHeight);
 
     lineX += mes.width;
-    console.log(mes.width)
-    widths.append(mes.width)
+    console.log(mes.width);
+    widths.append(mes.width);
   }
 
   document.onkeydown = function (e) {
@@ -488,12 +466,13 @@ if (drawingCanvas != null) {
     }
     if (e.key === "Backspace") {
       return; //we can add this properly at some point later
+      // @ts-ignore
       ctx.fillStyle = "#ffffffff";
       ctx.fillRect(
-        (lineX - widths.getLast()) - 1,
+        lineX - widths.getLast() - 1,
         (currentTextLine - 1) * lineHeight,
         widths.getLast() + 1,
-        lineHeight+ 2
+        lineHeight + 2
       );
       lineX -= widths.getLast();
       if (lineX <= 0 && currentTextLine > 1) {
@@ -503,8 +482,8 @@ if (drawingCanvas != null) {
         lineX = 1;
         currentTextLine = 1;
       }
-      console.log(widths.getLast())
-      widths.delete(widths.getLast())
+      console.log(widths.getLast());
+      widths.delete(widths.getLast());
       return;
     }
     if (
@@ -540,6 +519,7 @@ if (drawingCanvas != null) {
       typeText(e.key);
   };
 
+  // @ts-ignore
   function clearCanvas() {
     currentTextLine = 1;
     lineX = 1;
@@ -580,7 +560,10 @@ function makeChatHtmlElement(userInfo, imageUri, fromSelf) {
  */
 function makeChatJoinNotifElement(userInfo, chatName) {
   // @ts-ignore
-  if (userInfo.username === JSON.parse(localStorage.getItem("userInfo")).username) {
+  if (
+    // @ts-ignore
+    userInfo.username === JSON.parse(localStorage.getItem("userInfo")).username
+  ) {
     var html = `<li
             style="
               background-color: greenyellow;
@@ -609,7 +592,10 @@ function makeChatJoinNotifElement(userInfo, chatName) {
  */
 function makeChatLeaveNotifElement(userInfo, chatName) {
   // @ts-ignore
-  if (userInfo.username === JSON.parse(localStorage.getItem("userInfo")).username) {
+  if (
+    // @ts-ignore
+    userInfo.username === JSON.parse(localStorage.getItem("userInfo")).username
+  ) {
     var html = `<li
             style="
               background-color: #ff0000;
@@ -691,8 +677,10 @@ function onEnter() {
 
   var targetImg = new Image();
 
+  // @ts-ignore
   const setAttribute = img.setAttribute;
   // override setAttribte
+  // @ts-ignore
   img.setAttribute = (key, value) => {
     if (key === "cropped") {
       if (
