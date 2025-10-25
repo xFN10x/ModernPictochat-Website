@@ -70,6 +70,7 @@ const drawingCanvas = document.getElementById("chatCanvas");
 const chatsDisplay = document.getElementById("chatsDisplay");
 // @ts-ignore
 const statusText = document.getElementById("status-text");
+const userDisplay = document.getElementById("peopleHereDisplay");
 
 const brushSize = 3;
 
@@ -87,6 +88,10 @@ var messageSending;
  * @type {string}
  */
 var ourID;
+/**
+ * @type {string | null}
+ */
+let chatIn = null;
 
 //connect with websocket
 
@@ -167,6 +172,8 @@ socket.onmessage = (
   console.log("Got message: " + data);
   if (data == "reloadChats") {
     reloadChats();
+    // @ts-ignore
+    updatePlayerList(chatIn);
   } else if (data == "Verified") {
     setInterval(function () {
       socket.send("ping");
@@ -183,7 +190,9 @@ socket.onmessage = (
         if (res.ok) {
           res.text().then((val) => {
             makeChatNotifElement(val);
-
+            // @ts-ignore
+            updatePlayerList(urlSearchParams.get("join"));
+            chatIn = urlSearchParams.get("join");
             socket.send(
               JSON.stringify({
                 messageType: 0,
@@ -199,6 +208,7 @@ socket.onmessage = (
                 }),
               })
             );
+            urlSearchParams.delete("join");
           });
         }
       });
@@ -250,6 +260,7 @@ var authed = false;
 socket.addEventListener("open", (event) => {
   if (!authed && urlSearchParams.has("key")) {
     socket.send("HANDSHAKE " + urlSearchParams.get("key"));
+    urlSearchParams.delete("key");
   }
 });
 
@@ -312,9 +323,9 @@ function reloadChats() {
         </div>`;
           // @ts-ignore
           chatsDisplay?.insertAdjacentHTML("beforeend", chatVisualHTML);
-          console.log(
-            `chat with id: ${key}, has ${data[key].peopleCurrently}/${data[key].maxPeople} people in it`
-          );
+          //console.log(
+          //  `chat with id: ${key}, has ${data[key].peopleCurrently}/${data[key].maxPeople} people in it`
+          //);
         }
         // @ts-ignore
         if (statusText != null)
@@ -346,6 +357,9 @@ function joinChat(id) {
           })
         );
         makeChatNotifElement(id);
+        chatIn = txt;
+        updatePlayerList(txt);
+
         socket.send(
           JSON.stringify({
             messageType: 0,
@@ -465,7 +479,7 @@ if (drawingCanvas != null) {
       return;
     }
     if (e.key === "Backspace") {
-      return; //we can add this properly at some point later
+      if (!e.shiftKey) return;
       // @ts-ignore
       ctx.fillStyle = "#ffffffff";
       ctx.fillRect(
@@ -537,7 +551,8 @@ reloadChats();
  */
 function makeChatHtmlElement(userInfo, imageUri, fromSelf) {
   if (messageSending) {
-    console.error("Message already sending.");
+    makeSilentNotifElement("Please wait until your last message sends.");
+    console.warn("Message already sending.");
     return false;
   }
   const html = `<li>
@@ -723,4 +738,76 @@ function onEnter() {
     marker: 'cropped'
 }`
   );
+}
+
+/**
+ * @param {string} chatID
+ */
+function updatePlayerList(chatID) {
+  fetch(
+    window.location.protocol +
+      "//" +
+      window.location.hostname +
+      (window.location.port !== "" ? ":" + window.location.port : "") +
+      "/api/getPeopleInChat/" +
+      chatID
+    //urlSearchParams.get("join")
+  ).then((rs) => {
+    if (rs.ok) {
+      // @ts-ignore
+      rs.json().then((json) => {
+        // @ts-ignore
+        userDisplay.innerHTML = "";
+        // @ts-ignore
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        const yourHTML = `<li
+            style="
+              background-color: ${userInfo.rgb}1f;
+              -webkit-text-fill-color: ${userInfo.rgb};
+            "
+          >
+                  ${userInfo.username} ${
+          userInfo.username ===
+          JSON.parse(
+            // @ts-ignore
+            localStorage.getItem("userInfo")
+          ).username
+            ? "<b>(You)</b>"
+            : ""
+        }
+          </li>`;
+        userDisplay?.insertAdjacentHTML("afterbegin", yourHTML);
+        //console.log(json);
+        let namesAlreadyAdded = [];
+        for (const key in json) {
+          if (
+            json[key].username === userInfo.username ||
+            namesAlreadyAdded.indexOf(json[key].username) != -1
+          ) {
+            continue;
+          }
+          console.log(namesAlreadyAdded);
+          namesAlreadyAdded.push(json[key].username);
+          const html = `<li
+            style="
+              background-color: ${json[key].rgb}1f;
+              -webkit-text-fill-color: ${json[key].rgb};
+            "
+          >
+                  ${json[key].username} ${
+            json[key].username ===
+            JSON.parse(
+              // @ts-ignore
+              localStorage.getItem("userInfo")
+            ).username
+              ? "<b>(You)</b>"
+              : ""
+          }
+          </li>`;
+          userDisplay?.insertAdjacentHTML("afterbegin", html);
+          //console.log(json[key].username);
+        }
+      });
+    }
+  });
 }

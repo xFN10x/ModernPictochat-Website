@@ -18,7 +18,9 @@
           (window.location.port !== "" ? ":" + window.location.port : "") +
           `/api/isPersonInChat/${new URLSearchParams(
             window.location.search
-          ).get("join")}/${JSON.parse(localStorage.getItem("userInfo")).username}`
+          ).get("join")}/${
+            JSON.parse(localStorage.getItem("userInfo")).username
+          }`
       ).then((res) => {
         if (res.ok) {
           res.text().then((text) => {
@@ -54,7 +56,7 @@
         font-family: "Pictochat";
         src: url("pictochat.otf.woff2");
       }
-      
+
       ul li {
         padding-left: 1.3rem;
         background-image: url("favicon.png");
@@ -68,14 +70,15 @@
         image-rendering: pixelated;
       }
 
-      ul {
+      #chatDiv > ul {
         /*rotate this so it goes down to up, then unrotate the elements*/
         transform: rotate(180deg);
         padding-inline-start: 0;
       }
-
-      ul > li {
+      #chatDiv > ul > li {
         transform: rotate(-180deg);
+      }
+      ul > li {
         font-family: "Pictochat";
         font-size: 25px;
         background-color: #ebebeb;
@@ -183,6 +186,7 @@
           </template>
         </ul>
         <div id="userControl" style="display: flex; justify-content: center">
+          
           <canvas
             id="chatCanvas"
             style="
@@ -210,6 +214,7 @@
               src="clear.png"
               onclick="clearCanvas()"
             />
+            
             <img
               id="enterImg"
               onclick="onEnter()"
@@ -227,70 +232,109 @@
           </div>
         </div>
       </div>
-      <!--<div style="justify-content: center; display: flex">-->
+
       <div
-        id="chatsDisplay"
         style="
-          overflow-x: clip;
-          overflow-y: auto;
-          max-width: 8rem;
-          padding: 1rem 1rem;
-          background-color: white;
-          border: 0.3rem solid black;
+          max-width: 16rem;
+          display: flex;
+          flex-direction: column;
+          min-width: 16rem;
         "
       >
-        <p style="text-align: center; margin-bottom: 0">Current Chats:</p>
-        <div style="width: 10rem"></div>
-        <p
-          id="status-text"
+        <div
+          id="chatsDisplay"
           style="
-            text-align: center;
-            margin-top: 1px;
-            -webkit-text-fill-color: #d3d3d3;
+            overflow-x: clip;
+            overflow-y: auto;
+
+            padding: 1rem 1rem;
+            height: 50%;
+            background-color: white;
+            border: 0.3rem solid black;
           "
         >
-          <i id="statusText">Loading...</i>
-        </p>
-        <template id="chatVisual">
-          <div
+          <p style="text-align: center; margin-bottom: 0">Current Chats:</p>
+          <div style="width: 10rem"></div>
+          <p
+            id="status-text"
             style="
-              min-height: 4rem;
-              background-color: white;
-              border: 0.2rem double black;
+              text-align: center;
+              margin-top: 1px;
+              -webkit-text-fill-color: #d3d3d3;
             "
           >
-            <p
+            <i id="statusText">Loading...</i>
+          </p>
+          <template id="chatVisual">
+            <div
               style="
-                margin: -3px 0;
-                -webkit-text-fill-color: white;
-                -webkit-text-stroke: 1px;
-                user-select: none;
+                min-height: 4rem;
+                background-color: white;
+                border: 0.2rem double black;
               "
-              class="bbh-sans-bartle-regular"
             >
-              Chat A
-            </p>
-            <img
-              src="people.png"
-              style="
-                image-rendering: crisp-edges;
-                padding-left: 4px;
-                margin-top: 4px;
-              "
-              width="20px"
-            />
-            <i
-              class="noto-sans"
-              style="-webkit-text-stroke: 0; -webkit-text-fill-color: black"
-              ><sup>1/15</sup></i
-            >
-            <div style="display: flex; padding: 5px; justify-content: right">
-              <button>Join!</button>
+              <p
+                style="
+                  margin: -3px 0;
+                  -webkit-text-fill-color: white;
+                  -webkit-text-stroke: 1px;
+                  user-select: none;
+                "
+                class="bbh-sans-bartle-regular"
+              >
+                Chat A
+              </p>
+              <img
+                src="people.png"
+                style="
+                  image-rendering: crisp-edges;
+                  padding-left: 4px;
+                  margin-top: 4px;
+                "
+                width="20px"
+              />
+              <i
+                class="noto-sans"
+                style="-webkit-text-stroke: 0; -webkit-text-fill-color: black"
+                ><sup>1/15</sup></i
+              >
+              <div style="display: flex; padding: 5px; justify-content: right">
+                <button>Join!</button>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
+        <ul
+          id="peopleHereDisplay"
+          style="
+            margin-top: 1rem;
+            overflow-x: clip;
+            overflow-y: auto;
+            padding: 1rem 1rem;
+            flex: auto;
+            background-color: white;
+            list-style: none;
+            border: 0.3rem solid black;
+          "
+        >
+          <template
+            style="
+              background-color: #ff00001f;
+              -webkit-text-fill-color: #ff0000;
+            "
+          >
+            Somebody <b>(You)</b>
+          </template>
+          <template
+            style="
+              background-color: #00d5ff1f;
+              -webkit-text-fill-color: #00d5ff;
+            "
+          >
+            Some other guy
+          </template>
+        </ul>
       </div>
-      <!--</div>-->
     </div>
   </body>
 </html>
